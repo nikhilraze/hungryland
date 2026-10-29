@@ -55,6 +55,44 @@ function validate(values, { requireAddress }) {
   return errors;
 }
 
+function buildWhatsAppUrl(order) {
+  const { customer, items, totals, fulfilment, payment } = order;
+  const itemLines = items.map((item) => {
+    const portion = item.portion ? ` (${item.portion})` : '';
+    const addons = item.addons.length ? ` + ${item.addons.join(', ')}` : '';
+    return `• ${item.quantity} × ${item.name}${portion}${addons} — ${formatPrice(item.lineTotal)}`;
+  });
+  const fulfilmentLabel = fulfilment === 'delivery' ? 'Delivery' : 'Takeaway';
+  const address = fulfilment === 'delivery'
+    ? `\nAddress: ${customer.address}${customer.landmark ? `\nLandmark: ${customer.landmark}` : ''}`
+    : '';
+  const notes = customer.notes ? `\nNotes: ${customer.notes}` : '';
+
+  const message = [
+    `*New order · ${order.id}*`,
+    '',
+    `Customer: ${customer.name}`,
+    `Phone: ${customer.phone}`,
+    customer.email ? `Email: ${customer.email}` : null,
+    `Fulfilment: ${fulfilmentLabel}${address}`,
+    `Payment: ${payment.label}`,
+    '',
+    '*Items*',
+    ...itemLines,
+    '',
+    `Subtotal: ${formatPriceExact(totals.subtotal)}`,
+    `GST: ${formatPriceExact(totals.taxes)}`,
+    `Packaging: ${formatPrice(totals.packaging)}`,
+    `Delivery: ${totals.isDelivery ? formatPrice(totals.delivery) : 'Takeaway'}`,
+    `*Total: ${formatPriceExact(totals.total)}*`,
+    notes,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return `https://wa.me/${restaurant.whatsapp}?text=${encodeURIComponent(message)}`;
+}
+
 export default function Checkout() {
   const { items, totals, fulfilment, placeOrder } = useCart();
   const { toast } = useToast();
@@ -104,8 +142,6 @@ export default function Checkout() {
     }
 
     setIsPlacing(true);
-    // Stand-in for the real order API call.
-    await new Promise((r) => setTimeout(r, 900));
 
     const order = placeOrder({
       id: orderNumber(),
@@ -113,8 +149,14 @@ export default function Checkout() {
       payment: PAYMENT_METHODS.find((p) => p.id === payment),
     });
 
+    const whatsappWindow = window.open(buildWhatsAppUrl(order), '_blank', 'noopener,noreferrer');
     setIsPlacing(false);
-    toast({ title: 'Order placed!', description: `Order ${order.id} is confirmed.` });
+    toast({
+      title: whatsappWindow ? 'Order ready to send!' : 'Order placed!',
+      description: whatsappWindow
+        ? 'Review the pre-filled WhatsApp message and tap send.'
+        : 'WhatsApp was blocked. Your order is still confirmed.',
+    });
     navigate('/order-confirmed', { replace: true });
   };
 

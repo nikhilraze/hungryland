@@ -152,11 +152,16 @@ scripts/
 
 ## Production integration work
 
-The checkout page currently validates the form and keeps the resulting order in
-memory for the confirmation page. It does **not** process payments or send orders
-to a backend. Before accepting real orders, connect `placeOrder()` in
-[`src/pages/Checkout.jsx`](./src/pages/Checkout.jsx) to an order API and payment
-provider such as Razorpay, PhonePe, or Cashfree.
+The checkout page validates the form, opens a pre-filled WhatsApp message to the
+restaurant, and keeps the resulting order in memory for the confirmation page.
+The restaurant WhatsApp number is configured as `restaurant.whatsapp` in
+[`src/data/restaurant.js`](./src/data/restaurant.js); replace the placeholder
+number with the correct WhatsApp-enabled number before publishing.
+
+The app does **not** process payments or persist orders to a backend. The online
+payment option is currently informational. Before accepting online payments,
+connect `placeOrder()` in [`src/pages/Checkout.jsx`](./src/pages/Checkout.jsx) to
+an order API and payment provider such as Razorpay, PhonePe, or Cashfree.
 
 The contact form also needs a server-side endpoint. Do not put payment secrets,
 API keys, or other credentials in this frontend repository.

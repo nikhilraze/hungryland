@@ -26,6 +26,7 @@ export const restaurant = {
     'https://www.google.com/maps/place/The+Hungry+Land/@22.0493475,88.0651986,17z/data=!3m1!4b1!4m6!3m5!1s0x3a02f1cdf9f39e2f:0x7b8f20eda0eb9eb7!8m2!3d22.0493475!4d88.0677735',
 
   phones: ['8972686679', '8116292286', '7384324637'],
+  whatsapp: '918972686679',
 
   email: 'hello@thehungryland.in', // TODO(owner): confirm or replace
 
