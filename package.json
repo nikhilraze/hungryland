@@ -1,0 +1,26 @@
+{
+  "name": "the-hungry-land",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Official website & online ordering platform for The Hungry Land, Haldia",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve:dist": "python3 scripts/preview-server.py",
+    "check:menu": "node scripts/check-menu.mjs",
+    "images:fetch": "node scripts/fetch-images.mjs"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.7.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tailwindcss": "^4.1.11",
+    "vite": "^7.0.6"
+  }
+}
