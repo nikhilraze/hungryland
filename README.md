@@ -150,19 +150,35 @@ scripts/
   preview-server.py
 ```
 
-## Production integration work
+## Order delivery and production integration
 
-The checkout page validates the form and redirects to a pre-filled WhatsApp
-message to the restaurant. The WhatsApp chat opens in the same tab so the
-redirect is reliable on desktop and mobile browsers.
-The restaurant WhatsApp number is configured as `restaurant.whatsapp` in
-[`src/data/restaurant.js`](./src/data/restaurant.js); replace the placeholder
-number with the correct WhatsApp-enabled number before publishing.
+### WhatsApp ordering
+
+The current order flow is:
+
+1. A customer reviews the cart and completes the checkout form.
+2. The form validates the customer, fulfilment, and delivery details.
+3. Selecting **Place Order** creates a pre-filled WhatsApp message.
+4. The browser redirects to the restaurant's WhatsApp chat in the same tab.
+5. The customer reviews the message and taps **Send** in WhatsApp.
+
+The message includes the order number, customer contact details, delivery or
+takeaway selection, address and landmark when applicable, payment method, item
+quantities, portions, add-ons, kitchen notes, and the complete price breakdown.
+
+The destination number is configured as `restaurant.whatsapp` in
+[`src/data/restaurant.js`](./src/data/restaurant.js). It must be an active
+WhatsApp number in international format without `+`, spaces, or punctuation.
+Update it before publishing if the restaurant uses a different number.
+
+### Payments and backend
 
 The app does **not** process payments or persist orders to a backend. The online
-payment option is currently informational. Before accepting online payments,
-connect `placeOrder()` in [`src/pages/Checkout.jsx`](./src/pages/Checkout.jsx) to
-an order API and payment provider such as Razorpay, PhonePe, or Cashfree.
+payment option is currently informational; customers should use the payment
+method agreed with the restaurant in WhatsApp. For automated order storage or
+online payments, connect `placeOrder()` in
+[`src/pages/Checkout.jsx`](./src/pages/Checkout.jsx) to an order API and a
+provider such as Razorpay, PhonePe, or Cashfree.
 
 The contact form also needs a server-side endpoint. Do not put payment secrets,
 API keys, or other credentials in this frontend repository.
