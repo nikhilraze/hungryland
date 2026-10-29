@@ -96,6 +96,42 @@ Run the integrity check after editing:
 npm run check:menu
 ```
 
+### Temporarily pausing a dish
+
+Owners can hide a dish from ordering without deleting its menu data. Add
+`available: false` to that dish in `src/data/menu.js`:
+
+```js
+{
+  name: 'Chicken Biryani with Egg & Raita',
+  available: false,
+  // ...
+}
+```
+
+The dish remains visible with an **Out of stock** label, but quick-add and
+detail-view ordering are disabled. If a dish was already in a customer's cart,
+the cart flags it and checkout requires the customer to remove it. Remove the
+flag or set `available: true` to make the dish orderable again. Dishes are
+available by default when the property is omitted.
+
+### Owner admin page
+
+The owner can manage availability from `/admin`:
+
+1. Copy `.env.example` to `.env`.
+2. Set `VITE_ADMIN_PASSWORD` to a private password.
+3. Restart the Vite server or rebuild after changing the environment file.
+4. Open `/admin` and sign in.
+5. Use the switch beside any meal to enable or disable ordering.
+
+Availability overrides are saved in the browser's `localStorage`, so they apply
+immediately to that browser and device. The owner must use the same deployed
+browser/device to see those changes. The login is a client-side convenience
+only: Vite embeds `VITE_*` values in the public JavaScript bundle, so this is
+not a secure admin system. For real owner-only access across devices, add a
+server-side authentication and database service.
+
 ## Images
 
 The project uses freely licensed placeholder photography from Wikimedia Commons.
