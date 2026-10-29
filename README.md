@@ -152,8 +152,9 @@ scripts/
 
 ## Production integration work
 
-The checkout page validates the form, opens a pre-filled WhatsApp message to the
-restaurant, and keeps the resulting order in memory for the confirmation page.
+The checkout page validates the form and redirects to a pre-filled WhatsApp
+message to the restaurant. The WhatsApp chat opens in the same tab so the
+redirect is reliable on desktop and mobile browsers.
 The restaurant WhatsApp number is configured as `restaurant.whatsapp` in
 [`src/data/restaurant.js`](./src/data/restaurant.js); replace the placeholder
 number with the correct WhatsApp-enabled number before publishing.

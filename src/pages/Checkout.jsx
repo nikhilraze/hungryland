@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Field from '../components/ui/Field';
 import Button from '../components/ui/Button';
 import Icon from '../components/ui/Icon';
@@ -96,7 +96,6 @@ function buildWhatsAppUrl(order) {
 export default function Checkout() {
   const { items, totals, fulfilment, placeOrder } = useCart();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const [values, setValues] = useState(EMPTY);
   const [touched, setTouched] = useState({});
@@ -149,15 +148,7 @@ export default function Checkout() {
       payment: PAYMENT_METHODS.find((p) => p.id === payment),
     });
 
-    const whatsappWindow = window.open(buildWhatsAppUrl(order), '_blank', 'noopener,noreferrer');
-    setIsPlacing(false);
-    toast({
-      title: whatsappWindow ? 'Order ready to send!' : 'Order placed!',
-      description: whatsappWindow
-        ? 'Review the pre-filled WhatsApp message and tap send.'
-        : 'WhatsApp was blocked. Your order is still confirmed.',
-    });
-    navigate('/order-confirmed', { replace: true });
+    window.location.assign(buildWhatsAppUrl(order));
   };
 
   return (
