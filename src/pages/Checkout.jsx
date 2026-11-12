@@ -94,7 +94,7 @@ function buildWhatsAppUrl(order) {
 }
 
 export default function Checkout() {
-  const { items, totals, fulfilment, placeOrder } = useCart();
+  const { items, totals, fulfilment, placeOrder, unavailableItems } = useCart();
   const { toast } = useToast();
 
   const [values, setValues] = useState(EMPTY);
@@ -126,6 +126,15 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
+
+    if (unavailableItems.length > 0) {
+      toast({
+        title: 'Some items are unavailable',
+        description: 'Return to your cart and remove out-of-stock items.',
+        variant: 'error',
+      });
+      return;
+    }
 
     if (Object.keys(errors).length > 0) {
       toast({
