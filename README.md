@@ -132,6 +132,16 @@ only: Vite embeds `VITE_*` values in the public JavaScript bundle, so this is
 not a secure admin system. For real owner-only access across devices, add a
 server-side authentication and database service.
 
+### Netlify deployment
+
+This is a client-side Vite app, so Netlify must rewrite unknown paths to
+`index.html` for routes such as `/admin` to load on a direct visit. The
+`public/_redirects` file is included for this purpose.
+
+In the Netlify site settings, add `VITE_ADMIN_PASSWORD` under **Environment
+variables**, then trigger a new deploy. The local `.env` file is ignored and is
+not uploaded to Netlify.
+
 ## Images
 
 The project uses freely licensed placeholder photography from Wikimedia Commons.
@@ -160,6 +170,7 @@ usable Commons image was not available.
 | `/order-confirmed` | Order confirmation |
 | `/about` | Restaurant story and image credits |
 | `/contact` | Contact details and contact form |
+| `/admin` | Owner menu availability dashboard |
 
 Menu filters are URL-driven, so filtered views can be shared. For example:
 `/menu?category=tandoor&diet=nonveg&sort=price-asc`.
