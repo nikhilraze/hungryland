@@ -13,7 +13,7 @@ import { formatPriceExact } from '../utils/format';
 import { useSeo } from '../hooks/useSeo';
 
 export default function Cart() {
-  const { items, totals, clearCart } = useCart();
+  const { items, totals, clearCart, unavailableItems } = useCart();
   const [selected, setSelected] = useState(null);
 
   useSeo({
@@ -74,10 +74,23 @@ export default function Cart() {
               <div className="mt-5">
                 <OrderSummary />
               </div>
-              <Button to="/checkout" size="lg" className="mt-6 w-full">
+              <Button
+                to="/checkout"
+                size="lg"
+                className={unavailableItems.length > 0 ? 'mt-6 w-full cursor-not-allowed opacity-50' : 'mt-6 w-full'}
+                aria-disabled={unavailableItems.length > 0}
+                onClick={(event) => {
+                  if (unavailableItems.length > 0) event.preventDefault();
+                }}
+              >
                 Proceed to checkout
                 <Icon name="arrowRight" size={17} />
               </Button>
+              {unavailableItems.length > 0 && (
+                <p className="mt-3 rounded-2xl bg-chilli/10 p-3 text-center text-xs leading-relaxed text-chilli">
+                  Remove unavailable items before checkout.
+                </p>
+              )}
               <p className="mt-3.5 text-center text-xs leading-relaxed text-char-400">
                 Cash on delivery and online payment both accepted.
               </p>
