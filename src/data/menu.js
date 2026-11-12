@@ -19,6 +19,7 @@
  *    ingredients  — array of strings
  *    note         — small print shown on the dish page
  *    tags         — 'popular' | 'featured' | 'special' (Today's Special)
+ *    available    — set to false when the owner wants to pause ordering
  *
  *  ⚠ PRICE VERIFICATION: the Veg, Dal, Roti and Chicken cards were photographed
  *  at an angle and their Half/Full columns did not line up perfectly with the
@@ -1138,6 +1139,7 @@ export const DISHES = Object.entries(RAW).flatMap(([categoryId, dishes]) =>
       description: dish.description ?? '',
       ingredients: dish.ingredients ?? [],
       note: dish.note ?? null,
+      available: dish.available !== false,
       image: dish.image ?? CATEGORIES.find((c) => c.id === categoryId)?.image ?? 'heroSpread',
       variants,
       basePrice: Math.min(...variants.map((v) => v.price)),
