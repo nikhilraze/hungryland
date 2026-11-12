@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useReducer, useEffect, useState } from 'react';
 import { restaurant } from '../data/restaurant';
 import { getDishById, getVariant } from '../data/menu';
+import { useAvailability } from './AvailabilityContext';
 
 const CartContext = createContext(null);
 
@@ -14,6 +15,8 @@ function reducer(state, action) {
   switch (action.type) {
     case 'add': {
       const { dishId, variantId, addonIds = [], quantity = 1 } = action.payload;
+      const dish = getDishById(dishId);
+      if (!dish?.available) return state;
       const key = lineKey(dishId, variantId, addonIds);
       const existing = state.lines.find((l) => l.key === key);
       if (existing) {
@@ -75,6 +78,7 @@ function readStored() {
 }
 
 export function CartProvider({ children }) {
+  const { getDishState, isAvailable } = useAvailability();
   const [state, dispatch] = useReducer(reducer, initialState, readStored);
   const [isOpen, setIsOpen] = useState(false);
   const [lastOrder, setLastOrder] = useState(null);
@@ -92,7 +96,7 @@ export function CartProvider({ children }) {
     () =>
       state.lines
         .map((line) => {
-          const dish = getDishById(line.dishId);
+          const dish = getDishState(getDishById(line.dishId));
           if (!dish) return null; // dish was removed from the menu
           const variant = getVariant(dish, line.variantId);
           const addons = line.addonIds
@@ -107,10 +111,11 @@ export function CartProvider({ children }) {
             addons,
             unitPrice,
             lineTotal: unitPrice * line.quantity,
+            available: dish.available,
           };
         })
         .filter(Boolean),
-    [state.lines]
+    [getDishState, state.lines]
   );
 
   const totals = useMemo(() => {
@@ -138,7 +143,16 @@ export function CartProvider({ children }) {
     };
   }, [items, state.fulfilment]);
 
-  const addItem = useCallback((payload) => dispatch({ type: 'add', payload }), []);
+  const unavailableItems = useMemo(() => items.filter((item) => !item.available), [items]);
+
+  const addItem = useCallback(
+    (payload) => {
+      const dish = getDishById(payload.dishId);
+      if (!dish || !isAvailable(dish)) return;
+      dispatch({ type: 'add', payload });
+    },
+    [isAvailable]
+  );
   const setQuantity = useCallback(
     (key, quantity) => dispatch({ type: 'setQuantity', payload: { key, quantity } }),
     []
@@ -178,6 +192,7 @@ export function CartProvider({ children }) {
   const value = useMemo(
     () => ({
       items,
+      unavailableItems,
       totals,
       fulfilment: state.fulfilment,
       isOpen,
@@ -194,10 +209,11 @@ export function CartProvider({ children }) {
     }),
     [
       items,
+      unavailableItems,
+      addItem,
       totals,
       state.fulfilment,
       isOpen,
-      addItem,
       setQuantity,
       removeItem,
       clearCart,
