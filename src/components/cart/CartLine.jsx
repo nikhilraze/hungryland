@@ -43,6 +43,9 @@ export default function CartLine({ item, compact = false }) {
               {item.dish.categoryName}
               {item.dish.hasPortions && ` · ${item.variant.label}`}
             </p>
+            {!item.available && (
+              <p className="mt-1 text-xs font-semibold text-chilli">Currently out of stock</p>
+            )}
           </div>
 
           <button
