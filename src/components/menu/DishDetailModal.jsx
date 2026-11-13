@@ -9,9 +9,12 @@ import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
 import { imageCredit } from '../../data/images';
 import { formatPrice, cn } from '../../utils/format';
+import { useAvailability } from '../../context/AvailabilityContext';
 
 export default function DishDetailModal({ dish, open, onClose }) {
   const { addItem, openCart } = useCart();
+  const { getDishState } = useAvailability();
+  dish = getDishState(dish);
   const { toast } = useToast();
 
   const [variantId, setVariantId] = useState(null);
@@ -46,6 +49,7 @@ export default function DishDetailModal({ dish, open, onClose }) {
     setAddonIds((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
   const handleAdd = () => {
+    if (!dish.available) return;
     addItem({ dishId: dish.id, variantId: variant.id, addonIds, quantity });
     toast({
       title: `${quantity} × ${dish.name}`,
@@ -80,6 +84,7 @@ export default function DishDetailModal({ dish, open, onClose }) {
                 Today&apos;s Special
               </Tag>
             )}
+            {!dish.available && <Tag tone="dark">Out of stock</Tag>}
             {dish.isPopular && <Tag tone="dark">Popular</Tag>}
           </div>
 
@@ -239,9 +244,11 @@ export default function DishDetailModal({ dish, open, onClose }) {
               </div>
             </div>
 
-            <Button size="lg" onClick={handleAdd} className="w-full">
-              <Icon name="cart" size={18} />
-              Add {quantity > 1 ? `${quantity} ` : ''}to cart · {formatPrice(total)}
+            <Button size="lg" onClick={handleAdd} disabled={!dish.available} className="w-full">
+              <Icon name={dish.available ? 'cart' : 'minus'} size={18} />
+              {dish.available
+                ? `Add ${quantity > 1 ? `${quantity} ` : ''}to cart · ${formatPrice(total)}`
+                : 'Currently out of stock'}
             </Button>
           </div>
         </div>

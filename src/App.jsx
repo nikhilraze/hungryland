@@ -8,11 +8,13 @@ import OrderConfirmation from './pages/OrderConfirmation';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
+import Admin from './pages/Admin';
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
+        <Route path="/admin" element={<Admin />} />
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/cart" element={<Cart />} />
