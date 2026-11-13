@@ -4,14 +4,19 @@ import SmartImage from '../ui/SmartImage';
 import Icon from '../ui/Icon';
 import { DietMark, SpiceMeter, Tag } from '../ui/Badge';
 import { formatPrice, cn } from '../../utils/format';
+import { useAvailability } from '../../context/AvailabilityContext';
 
 export default function DishCard({ dish, onOpen, index = 0 }) {
   const { addItem, quantityOfDish } = useCart();
+  const { getDishState } = useAvailability();
+  const currentDish = getDishState(dish);
+  dish = currentDish;
   const { toast } = useToast();
   const inCart = quantityOfDish(dish.id);
 
   const handleAdd = (e) => {
     e.stopPropagation();
+    if (!dish.available) return;
     const variant = dish.variants[0];
     addItem({ dishId: dish.id, variantId: variant.id, addonIds: [], quantity: 1 });
     toast({
@@ -56,6 +61,7 @@ export default function DishCard({ dish, onOpen, index = 0 }) {
             </Tag>
           )}
           {dish.isPopular && !dish.isSpecial && <Tag tone="dark">Popular</Tag>}
+          {!dish.available && <Tag tone="dark">Out of stock</Tag>}
         </div>
 
         <span className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg bg-white/92 shadow-sm backdrop-blur dark:bg-char-900/90">
@@ -104,21 +110,26 @@ export default function DishCard({ dish, onOpen, index = 0 }) {
           <button
             type="button"
             onClick={handleAdd}
+            disabled={!dish.available}
             className={cn(
               'relative z-20 inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold',
               'transition-all duration-300 ease-[var(--ease-out-soft)] hover:-translate-y-0.5 active:translate-y-0',
-              inCart
+              !dish.available
+                ? 'cursor-not-allowed bg-char-200 text-char-500 dark:bg-char-700 dark:text-char-400'
+                : inCart
                 ? 'bg-leaf/12 text-leaf hover:bg-leaf/20'
                 : 'bg-char-900 text-white hover:bg-ember-500 dark:bg-char-50 dark:text-char-900 dark:hover:bg-ember-400'
             )}
             aria-label={
-              dish.hasPortions
+              !dish.available
+                ? `${dish.name} is out of stock`
+                : dish.hasPortions
                 ? `Add ${dish.name} (${dish.variants[0].label}) to cart`
                 : `Add ${dish.name} to cart`
             }
           >
-            <Icon name={inCart ? 'check' : 'plus'} size={15} strokeWidth={2.4} />
-            {inCart ? `${inCart} in cart` : 'Add'}
+            <Icon name={!dish.available ? 'minus' : inCart ? 'check' : 'plus'} size={15} strokeWidth={2.4} />
+            {!dish.available ? 'Unavailable' : inCart ? `${inCart} in cart` : 'Add'}
           </button>
         </div>
       </div>
